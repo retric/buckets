@@ -1,0 +1,12 @@
+*~
+.DS_Store
+bin/
+include/
+lib/
+.env
+*.sqlite
+venv
+*.swp
+*.pyc
+.Python
+static/libs
