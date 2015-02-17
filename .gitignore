@@ -3,10 +3,10 @@
 bin/
 include/
 lib/
-.env
+node_modules/
+venv/
 *.sqlite
-venv
 *.swp
 *.pyc
 .Python
-static/libs
+app/static/libs/
