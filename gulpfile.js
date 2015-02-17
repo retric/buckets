@@ -2,9 +2,10 @@ var gulp       = require('gulp');
 var browserify = require('browserify'); // Bundles JS.
 var del        = require('del'); // Deletes files.
 var reactify   = require('reactify'); // Transforms React JSX to JS.
+var source     = require('vinyl-source-stream');
 
 var paths = {
-  app_js: ['app/static/jsx/app.jsx'],
+  app_js: ['./app/static/jsx/app.jsx'],
   js: ['app/static/js/*.js']
 };
 

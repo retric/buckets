@@ -3,7 +3,7 @@ buckets
 
 Intro
 -----
-Experimental Boilerplate with Flask and React. Bower is used to manage front-end
+Experimental boilerplate with Flask and React. Bower is used to manage front-end
 dependencies, with browserify run via gulp to compile them.
 
 This project assumes that any node binaries installed locally via npm install
@@ -39,5 +39,7 @@ Run Flask server to launch the app
     $ python buckets.py
 
 Notes
------
-Boilerplate adapted from [flask-react](https://github.com/abhiomkar/flask-react)
+----- 
+Boilerplate adapted from
+[flaskr](https://github.com/mitsuhiko/flask/tree/master/examples/flaskr/) and
+[flask-react](https://github.com/abhiomkar/flask-react)
