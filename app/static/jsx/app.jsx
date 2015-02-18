@@ -1,5 +1,6 @@
 /** @jsx React.DOM */
 var React = require('react');  // Browserify!
+var jquery = require('jquery');
  
 var HelloMessage = React.createClass({  // Create a component, HelloMessage.
   render: function() {

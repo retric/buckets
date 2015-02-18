@@ -10,4 +10,4 @@ venv/
 *.pyc
 .Python
 app/static/libs/
-app/static/js/bundle.js
+app/static/js/
