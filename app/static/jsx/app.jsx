@@ -1,12 +1,15 @@
 /** @jsx React.DOM */
-var React = require('react');  // Browserify!
-var jquery = require('jquery');
+var React   = require('react');  // Browserify!
+var jquery  = require('jquery');
+var Buckets = require('./components/buckets.jsx');
  
-var HelloMessage = React.createClass({  // Create a component, HelloMessage.
+var App = React.createClass({  // Create a component, App.
   render: function() {
-    return <div>Hello {this.props.name}</div>;  // Display a property.
+    return (
+      <Buckets />
+    );  
   }
 });
-React.renderComponent(  // Render HelloMessage component at #name.
-  <HelloMessage name="John" />,
-  document.getElementById('name'));
+React.render(  // Render component at #app.
+  <App name="Buckets" />,
+  document.getElementById('app'));

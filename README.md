@@ -29,15 +29,10 @@ Install required frontend libraries using [bower](http://bower.io/#install-bower
         
     $ bower install 
 
-Run gulp to handle browserify and build tasks
+Run gulp to start builds and flask 
     
     $ gulp
         
-Run Flask server to launch the app
-       
-    $ cd app
-    $ python buckets.py
-
 Notes
 ----- 
 Boilerplate adapted from

@@ -1,4 +1,5 @@
 var gulp       = require('gulp');
+var shell      = require('gulp-shell');
 var browserify = require('browserify'); // Bundles JS.
 var del        = require('del'); // Deletes files.
 var reactify   = require('reactify'); // Transforms React JSX to JS.
@@ -40,4 +41,8 @@ gulp.task('watch', function() {
   gulp.watch(paths.js, ['js']);
 });
 
-gulp.task('default', ['watch', 'js', 'libs']);
+// flask task.
+gulp.task('flask', ['js', 'libs'],
+          shell.task(['. venv/bin/activate && python app/buckets.py']));
+
+gulp.task('default', ['watch', 'js', 'libs', 'flask']);
