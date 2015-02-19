@@ -8,7 +8,7 @@ var concat     = require('gulp-concat-sourcemap');
 
 var paths = {
   app_js: ['./app/static/jsx/app.jsx'],
-  js: ['app/static/jsx/*.jsx']
+  js: ['app/static/jsx/*.jsx', 'app/static/jsx/components/*.jsx']
 };
 
 // dependency task. clean out existing builds.
@@ -45,4 +45,4 @@ gulp.task('watch', function() {
 gulp.task('flask', ['js', 'libs'],
           shell.task(['. venv/bin/activate && python app/buckets.py']));
 
-gulp.task('default', ['watch', 'js', 'libs', 'flask']);
+gulp.task('default', ['watch', 'js', 'libs']);
