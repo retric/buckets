@@ -3,8 +3,10 @@ buckets
 
 Intro
 -----
-Experimental boilerplate with Flask and React. Bower is used to manage front-end
-dependencies, with browserify run via gulp to compile them.
+An experimental web app using [React](http://facebook.github.io/react/)
+and a [Go](https://golang.org/) server backend.
+[Browserify](http://browserify.org/) and [gulp](http://gulpjs.com/) are used to
+bundle all js files and simplify frontend dependency management.
 
 This project assumes that any node binaries installed locally via npm install
 (such as bower and gulp) will be accessible via your PATH. This can be
@@ -17,24 +19,25 @@ Alternately, you could just install all node packages globally.
 
 Installation
 ------------ 
-Install python dependencies
-    
-    $ pip install flask requests 
+Required dependencies: node, go, [gpm](https://github.com/pote/gpm). 
 
-Install npm dependencies
+$GOROOT and $GOPATH should be set when running go builds; setup may be
+simplified with [gvm](https://github.com/moovweb/gvm).
 
+Steps:
+
+Install package dependencies.
+
+    $ gpm install
     $ npm install
-
-Install required frontend libraries using [bower](http://bower.io/#install-bower).
-        
     $ bower install 
 
-Run gulp to start builds and flask 
+Run gulp to start the builds. 
     
     $ gulp
         
-Notes
------ 
-Boilerplate adapted from
-[flaskr](https://github.com/mitsuhiko/flask/tree/master/examples/flaskr/) and
-[flask-react](https://github.com/abhiomkar/flask-react)
+Run the buckets executable within app to start the server.
+    
+    $ cd app
+    $ ./buckets
+

@@ -7,8 +7,9 @@ var source     = require('vinyl-source-stream');
 var concat     = require('gulp-concat-sourcemap');
 
 var paths = {
-  app_js: ['./app/static/jsx/app.jsx'],
-  js: ['app/static/jsx/*.jsx', 'app/static/jsx/components/*.jsx']
+  jsx: ['./app/static/jsx/app.jsx'],
+  js: ['app/static/jsx/*.jsx', 'app/static/jsx/components/*.jsx'],
+  go: ['app/buckets.go']
 };
 
 // dependency task. clean out existing builds.
@@ -18,7 +19,7 @@ gulp.task('clean', function(done) {
 
 // JS task. browserify existing code and compile React JSX files.
 gulp.task('js', ['clean'], function() {
-  browserify(paths.app_js)
+  browserify(paths.jsx)
     .transform(reactify)
     .bundle()
     .pipe(source('bundle.js'))
@@ -39,10 +40,12 @@ gulp.task('libs', function() {
 // watch task. rerun tasks when files change.
 gulp.task('watch', function() {
   gulp.watch(paths.js, ['js']);
+  gulp.watch(paths.go,  ['build']);
 });
 
-// flask task.
-gulp.task('flask', ['js', 'libs'],
-          shell.task(['. venv/bin/activate && python app/buckets.py']));
+// build task.
+gulp.task('build', function () {
+  shell.task(['go app/buckets.go']);
+});
 
-gulp.task('default', ['watch', 'js', 'libs']);
+gulp.task('default', ['watch', 'js', 'libs', 'build']);

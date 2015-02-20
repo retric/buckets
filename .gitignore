@@ -11,3 +11,4 @@ venv/
 .Python
 app/static/libs/
 app/static/js/
+app/buckets

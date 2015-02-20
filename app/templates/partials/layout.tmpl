@@ -1,0 +1,19 @@
+{{ define "layout" }}
+<!doctype html>
+<head>
+    {{ template "title" . }}
+</head>
+<body>
+    {{ template "css" . }}
+    {{ template "scripts" . }}
+    {{ template "content" . }}
+
+</body>
+</html>
+{{ end }}
+
+{{ define "css" }}
+<link rel=stylesheet type=text/css href="{{ .Static }}/css/style.css">
+{{ end }}
+
+{{ define "scripts" }}{{ end }}
