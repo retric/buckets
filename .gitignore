@@ -7,8 +7,8 @@ node_modules/
 venv/
 *.sqlite
 *.swp
-*.pyc
-.Python
+*.log
 app/static/libs/
 app/static/js/
-app/buckets
+app/buckets/bin/*
+app/.gvm_local/

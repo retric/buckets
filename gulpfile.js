@@ -9,7 +9,7 @@ var concat     = require('gulp-concat-sourcemap');
 var paths = {
   jsx: ['./app/static/jsx/app.jsx'],
   js: ['app/static/jsx/*.jsx', 'app/static/jsx/components/*.jsx'],
-  go: ['app/buckets.go']
+  go: ['app/src/main/*.go']
 };
 
 // dependency task. clean out existing builds.
@@ -44,8 +44,6 @@ gulp.task('watch', function() {
 });
 
 // build task.
-gulp.task('build', function () {
-  shell.task(['go app/buckets.go']);
-});
+gulp.task('build', shell.task(['go install main | tee build.log']));
 
 gulp.task('default', ['watch', 'js', 'libs', 'build']);
