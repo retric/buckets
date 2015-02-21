@@ -34,9 +34,8 @@ func (c *MyController) LogoutHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func (c *MyController) StaticHandler(w http.ResponseWriter, req *http.Request) {
-	vars := mux.Vars(req)
-	asset, file := vars["asset"], vars["file"]
-	http.ServeFile(w, req, "../static/"+asset+"/"+file)
+	fmt.Printf("retrieving %s", req.URL.Path)
+	http.ServeFile(w, req, ".."+req.URL.Path)
 }
 
 /* Template Renderer */
@@ -93,7 +92,7 @@ func main() {
 		Handler(c.Action(c.LoginHandler))
 	muxer.Path("/logout").
 		Handler(c.Action(c.LogoutHandler))
-	muxer.Path("/static/{asset}/{file}").
+	muxer.PathPrefix("/static/").
 		Methods("GET").
 		Handler(c.Action(c.StaticHandler))
 

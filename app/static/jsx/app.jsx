@@ -16,6 +16,8 @@ var App = React.createClass({  // Create a component, App.
     );  
   }
 });
+
 React.render(  // Render component at #app.
   <App name="Buckets" />,
   document.getElementById('app'));
+
