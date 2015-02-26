@@ -33,7 +33,7 @@ var BucketList = React.createClass({
         );
       });
       return(
-        <div className="col-md-4 bucketCase">
+        <div className="bucketCase">
         <div className="bucket">
         <ol className="bucketList">
           {bucketnodes}

@@ -5,10 +5,12 @@ var del        = require('del'); // Deletes files.
 var reactify   = require('reactify'); // Transforms React JSX to JS.
 var source     = require('vinyl-source-stream');
 var concat     = require('gulp-concat-sourcemap');
+var sass       = require('gulp-sass');
 
 var paths = {
   jsx: ['./app/static/jsx/app.jsx'],
   js: ['app/static/jsx/*.jsx', 'app/static/jsx/components/*.jsx'],
+  css: ['app/static/css/scss/*.scss'],
   go: ['app/src/main/*.go']
 };
 
@@ -37,13 +39,20 @@ gulp.task('libs', function() {
     .pipe(gulp.dest('app/static/js'));
 });
 
+gulp.task('css', function() {
+    gulp.src('app/static/css/scss/*.scss')
+      .pipe(sass())
+      .pipe(gulp.dest('app/static/css'));
+});
+
 // watch task. rerun tasks when files change.
 gulp.task('watch', function() {
   gulp.watch(paths.js, ['js']);
   gulp.watch(paths.go,  ['build']);
+  gulp.watch(paths.css, ['css']);
 });
 
-// build task.
+// main build task.
 gulp.task('build', shell.task(['go install main | tee build.log']));
 
-gulp.task('default', ['watch', 'js', 'libs', 'build']);
+gulp.task('default', ['watch', 'js', 'libs', 'css', 'build']);
