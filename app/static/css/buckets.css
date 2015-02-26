@@ -1,0 +1,17 @@
+ol {
+    margin-bottom: 0;
+}
+
+.bucketCase {
+         padding-top: 15px;
+         padding-bottom: 15px;
+         margin: 1px;
+         }
+
+.bucket {
+    border-style: solid;
+    border-width: 1px;
+    padding: 10px;
+
+}
+

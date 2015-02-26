@@ -3,7 +3,11 @@ var React = require('react');
 var Buckets = React.createClass({
 
   render: function() {
-    var test = [ 0, 2, 4 ];
+    var test = new Array(6);
+    for (var i = 0; i < 6; i++) {
+        test[i] = 0;
+    }
+
     var data = this.props.data;
     var bucketlists = test.map(function(item, index) {
       return (
@@ -29,10 +33,12 @@ var BucketList = React.createClass({
         );
       });
       return(
-        <div className="col-md-4">
+        <div className="col-md-4 bucketCase">
+        <div className="bucket">
         <ol className="bucketList">
           {bucketnodes}
         </ol>
+        </div>
         </div>
       );
   }
