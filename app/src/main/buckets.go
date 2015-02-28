@@ -93,36 +93,7 @@ func (c *MyController) startWatcher() {
 
 	done := make(chan bool)
 
-	go func() {
-		for {
-			select {
-			case event := <-watcher.Events:
-				// check if file has been modified
-				mod := (event.Op&fsnotify.Create == fsnotify.Create) ||
-					(event.Op&fsnotify.Write == fsnotify.Write) ||
-					(event.Op&fsnotify.Rename == fsnotify.Rename)
-
-				if mod {
-					if filepath.Ext(event.Name) == ".tmpl" {
-						fmt.Printf("Op: %d, file: %s, filepath: %s\n",
-							event.Op, event.Name, filepath.Ext(event.Name))
-						file := event.Name
-						total := append(c.includes, file)
-
-						// wait to reload file as some editors delete/rename
-						time.Sleep(time.Second)
-						fmt.Printf("reloading %s template from %s\n",
-							filepath.Base(file), file)
-						c.templates[filepath.Base(file)] = template.Must(template.ParseFiles(total...))
-						fmt.Printf("reloaded %s template from %s\n",
-							filepath.Base(file), file)
-					}
-				}
-			case err := <-watcher.Errors:
-				fmt.Printf("error:", err)
-			}
-		}
-	}()
+	go c.watcherEvents(watcher)
 
 	err = watcher.Add("../templates")
 	err2 := watcher.Add("../templates/partials")
@@ -133,12 +104,47 @@ func (c *MyController) startWatcher() {
 	<-done
 }
 
+/* Handle watcher events */
+func (c *MyController) watcherEvents(watcher *fsnotify.Watcher) {
+	for {
+		select {
+		case event := <-watcher.Events:
+			// check if file has been modified
+			mod := (event.Op&fsnotify.Create == fsnotify.Create) ||
+				(event.Op&fsnotify.Write == fsnotify.Write) ||
+				(event.Op&fsnotify.Rename == fsnotify.Rename)
+
+			if mod {
+				if filepath.Ext(event.Name) == ".tmpl" {
+					fmt.Printf("Op: %d, file: %s, filepath: %s\n",
+						event.Op, event.Name, filepath.Ext(event.Name))
+					file := event.Name
+					total := append(c.includes, file)
+
+					// wait to reload file as some editors delete/rename
+					time.Sleep(time.Second)
+					fmt.Printf("reloading %s template from %s\n",
+						filepath.Base(file), file)
+					c.templates[filepath.Base(file)] = template.Must(template.ParseFiles(total...))
+					fmt.Printf("reloaded %s template from %s\n",
+						filepath.Base(file), file)
+				}
+			}
+		case err := <-watcher.Errors:
+			fmt.Printf("error:", err)
+		}
+	}
+}
+
 /* Main */
 func main() {
 	c := &MyController{page: map[string]string{"Static": "static"}}
 	muxer := mux.NewRouter().StrictSlash(true)
+
 	c.initTemplates()
 	go c.startWatcher()
+	mongoSession := dbSetup()
+	bucketsQuery(mongoSession)
 
 	/* Routes */
 	muxer.HandleFunc("/", c.HomeHandler)
