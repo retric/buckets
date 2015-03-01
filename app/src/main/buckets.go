@@ -143,8 +143,7 @@ func main() {
 
 	c.initTemplates()
 	go c.startWatcher()
-	mongoSession := dbSetup()
-	bucketsQuery(mongoSession)
+	//mongoSession := dbSetup()
 
 	/* Routes */
 	muxer.HandleFunc("/", c.HomeHandler)

@@ -11,7 +11,8 @@ var paths = {
   jsx: ['./app/static/jsx/app.jsx'],
   js: ['app/static/jsx/*.jsx', 'app/static/jsx/components/*.jsx'],
   css: ['app/static/css/scss/*.scss'],
-  go: ['app/src/main/*.go']
+  go: ['app/src/main/*.go'],
+  gotest: ['app/src/test/*.go']
 };
 
 // dependency task. clean out existing builds.
@@ -50,9 +51,11 @@ gulp.task('watch', function() {
   gulp.watch(paths.js, ['js']);
   gulp.watch(paths.go,  ['build']);
   gulp.watch(paths.css, ['css']);
+  gulp.watch(paths.gotest, ['buildtest']);
 });
 
-// main build task.
+// main build tasks.
 gulp.task('build', shell.task(['go install main | tee build.log']));
+gulp.task('buildtest', shell.task(['go install test | tee buildtest.log']));
 
-gulp.task('default', ['watch', 'js', 'libs', 'css', 'build']);
+gulp.task('default', ['watch', 'js', 'libs', 'css', 'build', 'buildtest']);
