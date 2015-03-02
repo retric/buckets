@@ -8,6 +8,7 @@ venv/
 *.sqlite
 *.swp
 *.log
+app/pkg/
 app/static/libs/
 app/static/js/
 app/buckets/bin/*

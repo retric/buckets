@@ -18,13 +18,13 @@ const (
 type (
 	// Task
 	Task struct {
-		ID           bson.ObjectId   `bson:"_id,omitempty"`
-		Name         string          `bson:"name"`
-		DateCreated  time.Time       `bson:"datecreated"`
-		DateModified time.Time       `bson:"datemodigied"`
-		Priority     int             `bson:"priority"`
-		Buckets      []bson.ObjectId `bson:buckets"`
-		Completed    bool            `bson:"completed"`
+		ID           bson.ObjectId `bson:"_id,omitempty"`
+		Name         string        `bson:"name"`
+		DateCreated  time.Time     `bson:"datecreated"`
+		DateModified time.Time     `bson:"datemodified"`
+		Priority     int           `bson:"priority"`
+		Buckets      []string      `bson:buckets"`
+		Completed    bool          `bson:"completed"`
 	}
 
 	// Buckets
@@ -75,17 +75,18 @@ func bucketsQuery(session *mgo.Session) {
 	log.Printf("bucketsQuery")
 }
 
-func insertBucket(bucket Bucket, collection *mgo.Collection) {
-	err := collection.Insert(bucket)
+func insertItem(doc interface{}, collection *mgo.Collection) {
+	err := collection.Insert(doc)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func removeBucket(bucketName string, collection *mgo.Collection) {
-	err := collection.Remove(bson.M{"name": bucketName})
+func removeItem(doc interface{}, collection *mgo.Collection) {
+	fmt.Printf("removeBucket: removing bucket from collection\n")
+	err := collection.Remove(doc)
 	if err != nil {
-		log.Fatal("error", err)
+		fmt.Println("error", err)
 	}
 }
 
@@ -99,12 +100,12 @@ func sessionTest(session *mgo.Session, f sessionFunc) {
 
 /* Test inserting a bucket into the db */
 func bucketTest(session *mgo.Session) {
-	fmt.Printf("retrieving collection\n")
+	fmt.Printf("bucketTest: retrieving collection\n")
 	collection := session.DB(TestDatabase).C("buckets")
 
 	fmt.Printf("inserting into collection\n")
 	bucket := Bucket{ID: bson.NewObjectId(), Name: "weekly"}
-	insertBucket(bucket, collection)
+	insertItem(bucket, collection)
 
 	fmt.Printf("retrieving from collection\n")
 	result := Bucket{}
@@ -113,19 +114,32 @@ func bucketTest(session *mgo.Session) {
 		log.Fatal("error:", err)
 	}
 	fmt.Println("Bucket:", result.Name)
-
-	removeBucket("weekly", collection)
+	fmt.Printf("removing bucket from collection\n")
+	removeItem(bson.M{"name": "weekly"}, collection)
 }
 
 /* Test inserting a task into the db */
 func taskTest(session *mgo.Session) {
-	//bucketCollection := session.DB(TestDatabase).C("buckets")
-	//taskCollection := session.DB(TestDatabase).C("tasks")
+	fmt.Printf("taskTest: retrieving collection\n")
+	bucketCollection := session.DB(TestDatabase).C("buckets")
+	taskCollection := session.DB(TestDatabase).C("tasks")
 
+	bucket := Bucket{ID: bson.NewObjectId(), Name: "weekly"}
+	insertItem(bucket, bucketCollection)
+
+	task := Task{ID: bson.NewObjectId(), Name: "read", Priority: 1,
+		DateCreated: time.Now().Local(), DateModified: time.Now().Local(),
+		Buckets: []string{}, Completed: false}
+	task.Buckets = append(task.Buckets, bucket.Name)
+	insertItem(task, taskCollection)
+
+	removeItem(bson.M{"name": "weekly"}, bucketCollection)
+	removeItem(task, taskCollection)
 }
 
 /* Main test suite */
-func main() {
+func TestMain() {
 	mongoSession := dbSetup()
 	sessionTest(mongoSession, bucketTest)
+	sessionTest(mongoSession, taskTest)
 }

@@ -50,12 +50,12 @@ gulp.task('css', function() {
 gulp.task('watch', function() {
   gulp.watch(paths.js, ['js']);
   gulp.watch(paths.go,  ['build']);
+  gulp.watch(paths.gotest, ['build']);
   gulp.watch(paths.css, ['css']);
-  gulp.watch(paths.gotest, ['buildtest']);
 });
 
 // main build tasks.
-gulp.task('build', shell.task(['go install main | tee build.log']));
+gulp.task('build', ['buildtest'], shell.task(['go install main | tee build.log']));
 gulp.task('buildtest', shell.task(['go install test | tee buildtest.log']));
 
 gulp.task('default', ['watch', 'js', 'libs', 'css', 'build', 'buildtest']);

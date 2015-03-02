@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"time"
 
+	"test"
+
 	"github.com/codegangsta/negroni"
 	"github.com/gorilla/mux"
 	"gopkg.in/fsnotify.v1"
@@ -140,6 +142,7 @@ func (c *MyController) watcherEvents(watcher *fsnotify.Watcher) {
 func main() {
 	c := &MyController{page: map[string]string{"Static": "static"}}
 	muxer := mux.NewRouter().StrictSlash(true)
+	test.TestMain()
 
 	c.initTemplates()
 	go c.startWatcher()
