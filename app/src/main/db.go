@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"log"
@@ -50,6 +51,20 @@ func dbSetup() *mgo.Session {
 	mongoSession.SetMode(mgo.Monotonic, true)
 
 	return mongoSession
+}
+
+func insertItem(doc interface{}, collection *mgo.Collection) {
+	err := collection.Insert(doc)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func removeItem(doc interface{}, collection *mgo.Collection) {
+	err := collection.Remove(doc)
+	if err != nil {
+		fmt.Println("error", err)
+	}
 }
 
 /* Query all buckets from the db */

@@ -57,13 +57,8 @@ func dbSetup() *mgo.Session {
 
 /* Query all buckets from the db */
 func bucketsQuery(session *mgo.Session) {
-	// Request socket connection from session.
-	// Close session when function is done and return connection to the pool.
-	sessionCopy := session.Copy()
-	defer sessionCopy.Close()
-
 	// Retrieve buckets collection.
-	collection := sessionCopy.DB(TestDatabase).C("buckets")
+	collection := session.DB(TestDatabase).C("buckets")
 
 	var buckets []Bucket
 	err := collection.Find(nil).All(&buckets)
@@ -83,7 +78,6 @@ func insertItem(doc interface{}, collection *mgo.Collection) {
 }
 
 func removeItem(doc interface{}, collection *mgo.Collection) {
-	fmt.Printf("removeBucket: removing bucket from collection\n")
 	err := collection.Remove(doc)
 	if err != nil {
 		fmt.Println("error", err)
@@ -91,7 +85,9 @@ func removeItem(doc interface{}, collection *mgo.Collection) {
 }
 
 /* Wrapper for calling other session tests */
-func sessionTest(session *mgo.Session, f sessionFunc) {
+func sessionWrap(session *mgo.Session, f sessionFunc) {
+	// Request socket connection from session.
+	// Close session when function is done and return connection to the pool.
 	sessionCopy := session.Copy()
 	defer sessionCopy.Close()
 
@@ -103,11 +99,11 @@ func bucketTest(session *mgo.Session) {
 	fmt.Printf("bucketTest: retrieving collection\n")
 	collection := session.DB(TestDatabase).C("buckets")
 
-	fmt.Printf("inserting into collection\n")
+	fmt.Printf("inserting bucket into collection\n")
 	bucket := Bucket{ID: bson.NewObjectId(), Name: "weekly"}
 	insertItem(bucket, collection)
 
-	fmt.Printf("retrieving from collection\n")
+	fmt.Printf("retrieving bucket from collection\n")
 	result := Bucket{}
 	err := collection.Find(bson.M{"name": "weekly"}).One(&result)
 	if err != nil {
@@ -131,7 +127,16 @@ func taskTest(session *mgo.Session) {
 		DateCreated: time.Now().Local(), DateModified: time.Now().Local(),
 		Buckets: []string{}, Completed: false}
 	task.Buckets = append(task.Buckets, bucket.Name)
+	fmt.Printf("taskTest: inserting task into collection")
 	insertItem(task, taskCollection)
+
+	fmt.Printf("retrieving task from collection")
+	result := Task{}
+	err := taskCollection.Find(bson.M{"name": "read"}).One(&result)
+	if err != nil {
+		log.Fatal("error:", err)
+	}
+	fmt.Println("Task:", result.Name)
 
 	removeItem(bson.M{"name": "weekly"}, bucketCollection)
 	removeItem(task, taskCollection)
@@ -140,6 +145,6 @@ func taskTest(session *mgo.Session) {
 /* Main test suite */
 func TestMain() {
 	mongoSession := dbSetup()
-	sessionTest(mongoSession, bucketTest)
-	sessionTest(mongoSession, taskTest)
+	sessionWrap(mongoSession, bucketTest)
+	sessionWrap(mongoSession, taskTest)
 }

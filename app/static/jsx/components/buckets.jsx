@@ -1,4 +1,5 @@
 var React = require('react');
+var NewBucket = require('./new.jsx');
 
 var Buckets = React.createClass({
 
@@ -17,6 +18,7 @@ var Buckets = React.createClass({
     return (
       <div className="row">
       {bucketlists}
+      <NewBucket />
       </div>
     );
   }
@@ -35,6 +37,7 @@ var BucketList = React.createClass({
       return(
         <div className="bucketCase">
         <div className="bucket">
+        <span className="listName">Name</span>
         <ol className="bucketList">
           {bucketnodes}
         </ol>
@@ -45,7 +48,7 @@ var BucketList = React.createClass({
 
 });
 
-var Item = React.createClass( {
+var Item = React.createClass({
   
   render: function() {
     return (
