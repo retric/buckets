@@ -68,7 +68,7 @@ func removeItem(doc interface{}, collection *mgo.Collection) {
 }
 
 /* Query all buckets from the db */
-func bucketsQuery(session *mgo.Session) {
+func getBuckets(session *mgo.Session) {
 	// Request socket connection from session.
 	// Close session when function is done and return connection to the pool.
 	sessionCopy := session.Copy()
@@ -85,4 +85,16 @@ func bucketsQuery(session *mgo.Session) {
 	}
 
 	log.Printf("bucketsQuery")
+}
+
+func getBucket(session *mgo.Session, id int) {
+
+}
+
+func getTasks(session *mgo.Session) {
+
+}
+
+func getTask(session *mgo.Session, id int) {
+
 }

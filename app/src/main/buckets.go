@@ -14,35 +14,6 @@ import (
 	"gopkg.in/fsnotify.v1"
 )
 
-type MyController struct {
-	AppController
-	page      map[string]string
-	templates map[string]*template.Template
-	includes  []string
-}
-
-/* View Handlers */
-func (c *MyController) HomeHandler(w http.ResponseWriter, req *http.Request) {
-	c.renderTemplate(w, "home.tmpl", c.page)
-}
-
-func (c *MyController) LoginHandler(w http.ResponseWriter, req *http.Request) {
-	if req.Method == "POST" {
-		// implement login logic here
-		http.Redirect(w, req, "/", 200)
-	}
-	c.renderTemplate(w, "login.tmpl", c.page)
-}
-
-func (c *MyController) LogoutHandler(w http.ResponseWriter, req *http.Request) {
-	http.Redirect(w, req, "/", 200)
-}
-
-func (c *MyController) StaticHandler(w http.ResponseWriter, req *http.Request) {
-	fmt.Printf("retrieving %s", req.URL.Path)
-	http.ServeFile(w, req, ".."+req.URL.Path)
-}
-
 /* Template Renderer */
 func (c *MyController) renderTemplate(w http.ResponseWriter, name string, data map[string]string) {
 	// Ensure the template exists in the map.
@@ -146,7 +117,7 @@ func main() {
 
 	c.initTemplates()
 	go c.startWatcher()
-	//mongoSession := dbSetup()
+	c.initSession(dbSetup())
 
 	/* Routes */
 	muxer.HandleFunc("/", c.HomeHandler)
@@ -158,6 +129,16 @@ func main() {
 	muxer.PathPrefix("/static/").
 		Methods("GET").
 		Handler(c.Action(c.StaticHandler))
+
+	/* API routes */
+	muxer.Path("/api/buckets/").
+		Handler(c.Action(c.BucketsHandler))
+	muxer.Path("/api/buckets/{id}").
+		Handler(c.Action(c.BucketHandler))
+	muxer.Path("/api/tasks").
+		Handler(c.Action(c.TasksHandler))
+	muxer.Path("/api/task/{id}").
+		Handler(c.Action(c.TaskHandler))
 
 	n := negroni.Classic()
 	n.UseHandler(muxer)
