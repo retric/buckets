@@ -1,10 +1,10 @@
-package main
+package buckets
 
 import (
 	"fmt"
 	"html/template"
 	"net/http"
-	"strconv"
+	//"strconv"
 
 	"github.com/gorilla/mux"
 	"gopkg.in/mgo.v2"
@@ -62,12 +62,13 @@ func (c *MyController) BucketsHandler(w http.ResponseWriter, req *http.Request) 
 }
 
 func (c *MyController) BucketHandler(w http.ResponseWriter, req *http.Request) {
-	vars := mux.Vars(req)
-	id, _ := strconv.Atoi(vars["id"])
+	// vars := mux.Vars(req)
+	// id, _ := vars["id"]
 
 	switch req.Method {
 	case "GET", "":
-		getBucket(c.session, id)
+		// bucket := getBucket(c.session, id)
+		// implement form return
 		return
 	case "POST":
 		return
@@ -86,7 +87,7 @@ func (c *MyController) TasksHandler(w http.ResponseWriter, req *http.Request) {
 
 func (c *MyController) TaskHandler(w http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
-	id, _ := strconv.Atoi(vars["id"])
+	id, _ := vars["id"]
 
 	switch req.Method {
 	case "GET", "":

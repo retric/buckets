@@ -1,59 +1,21 @@
-package test
+package buckets
 
 import (
 	"fmt"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"log"
+	"testing"
 	"time"
 )
 
 const (
-	MongoDBHosts = "localhost:27017"
-	AuthDatabase = "test"
 	TestDatabase = "test"
 )
 
-/* Document structs */
 type (
-	// Task
-	Task struct {
-		ID           bson.ObjectId `bson:"_id,omitempty"`
-		Name         string        `bson:"name"`
-		DateCreated  time.Time     `bson:"datecreated"`
-		DateModified time.Time     `bson:"datemodified"`
-		Priority     int           `bson:"priority"`
-		Buckets      []string      `bson:buckets"`
-		Completed    bool          `bson:"completed"`
-	}
-
-	// Buckets
-	Bucket struct {
-		ID    bson.ObjectId   `bson:"_id,omitempty"`
-		Name  string          `bson:"name"`
-		Tasks []bson.ObjectId `bson:"tasks"`
-	}
-
 	sessionFunc func(*mgo.Session)
 )
-
-/* Initialize session with database */
-func dbSetup() *mgo.Session {
-	mongoDBDialInfo := &mgo.DialInfo{
-		Addrs:    []string{MongoDBHosts},
-		Timeout:  60 * time.Second,
-		Database: AuthDatabase,
-	}
-
-	mongoSession, err := mgo.DialWithInfo(mongoDBDialInfo)
-	if err != nil {
-		log.Fatalf("CreateSession: %s\n", err)
-	}
-
-	mongoSession.SetMode(mgo.Monotonic, true)
-
-	return mongoSession
-}
 
 /* Query all buckets from the db */
 func bucketsQuery(session *mgo.Session) {
@@ -70,24 +32,10 @@ func bucketsQuery(session *mgo.Session) {
 	log.Printf("bucketsQuery")
 }
 
-func insertItem(doc interface{}, collection *mgo.Collection) {
-	err := collection.Insert(doc)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func removeItem(doc interface{}, collection *mgo.Collection) {
-	err := collection.Remove(doc)
-	if err != nil {
-		fmt.Println("error", err)
-	}
-}
-
 /* Wrapper for calling other session tests */
 func sessionWrap(session *mgo.Session, f sessionFunc) {
 	// Request socket connection from session.
-	// Close session when function is done and return connection to the pool.
+	// Close session when fusessionFunc func(*mgo.Session)nction is done and return connection to the pool.
 	sessionCopy := session.Copy()
 	defer sessionCopy.Close()
 
@@ -125,8 +73,8 @@ func taskTest(session *mgo.Session) {
 
 	task := Task{ID: bson.NewObjectId(), Name: "read", Priority: 1,
 		DateCreated: time.Now().Local(), DateModified: time.Now().Local(),
-		Buckets: []string{}, Completed: false}
-	task.Buckets = append(task.Buckets, bucket.Name)
+		Buckets: []bson.ObjectId{}, Completed: false}
+	task.Buckets = append(task.Buckets, bucket.ID)
 	fmt.Printf("taskTest: inserting task into collection")
 	insertItem(task, taskCollection)
 
@@ -142,9 +90,22 @@ func taskTest(session *mgo.Session) {
 	removeItem(task, taskCollection)
 }
 
-/* Main test suite */
-func TestMain() {
+func TestBucket(t *testing.T) {
 	mongoSession := dbSetup()
-	sessionWrap(mongoSession, bucketTest)
-	sessionWrap(mongoSession, taskTest)
+	bucket := CreateBucketTest(mongoSession)
+	GetBucketTest(mongoSession, bucket.ID.String())
+}
+
+/* Test retrieving a bucket */
+func GetBucketTest(session *mgo.Session, id string) {
+	bucket := getBucket(session, id)
+	if bucket == nil {
+
+	}
+}
+
+/* Test creating a bucket */
+func CreateBucketTest(session *mgo.Session) *Bucket {
+	bucket := createBucket(session, "weekly", []string{"54f41e6a5786752068000003"})
+	return bucket
 }

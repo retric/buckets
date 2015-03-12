@@ -1,4 +1,4 @@
-package main
+package buckets
 
 import (
 	"fmt"
@@ -11,7 +11,6 @@ import (
 const (
 	MongoDBHosts = "localhost:27017"
 	AuthDatabase = "test"
-	TestDatabase = "test"
 )
 
 /* Document structs */
@@ -75,7 +74,7 @@ func getBuckets(session *mgo.Session) {
 	defer sessionCopy.Close()
 
 	// Retrieve buckets collection.
-	collection := sessionCopy.DB(TestDatabase).C("buckets")
+	collection := sessionCopy.DB(AuthDatabase).C("buckets")
 
 	var buckets []Bucket
 	err := collection.Find(nil).All(&buckets)
@@ -87,14 +86,34 @@ func getBuckets(session *mgo.Session) {
 	log.Printf("bucketsQuery")
 }
 
-func getBucket(session *mgo.Session, id int) {
+func createBucket(session *mgo.Session, name string, tasks []string) *Bucket {
+	collection := session.DB(AuthDatabase).C("buckets")
 
+	tasksIds := make([]bson.ObjectId, len(tasks))
+	for i, task := range tasks {
+		tasksIds[i] = bson.ObjectIdHex(task)
+	}
+	bucket := Bucket{ID: bson.NewObjectId(), Name: name, Tasks: tasksIds}
+	insertItem(bucket, collection)
+
+	return &bucket
+}
+
+func getBucket(session *mgo.Session, id string) *Bucket {
+	collection := session.DB(AuthDatabase).C("buckets")
+
+	bucket := Bucket{}
+	err := collection.Find(bson.M{"_id": id}).One(&bucket)
+	if err != nil {
+		log.Printf("getBucket ERROR: %s:\n", err)
+	}
+	return &bucket
 }
 
 func getTasks(session *mgo.Session) {
 
 }
 
-func getTask(session *mgo.Session, id int) {
+func getTask(session *mgo.Session, id string) {
 
 }

@@ -1,4 +1,4 @@
-package main
+package buckets
 
 import (
 	"fmt"
@@ -6,8 +6,6 @@ import (
 	"net/http"
 	"path/filepath"
 	"time"
-
-	"test"
 
 	"github.com/codegangsta/negroni"
 	"github.com/gorilla/mux"
@@ -113,7 +111,6 @@ func (c *MyController) watcherEvents(watcher *fsnotify.Watcher) {
 func main() {
 	c := &MyController{page: map[string]string{"Static": "static"}}
 	muxer := mux.NewRouter().StrictSlash(true)
-	test.TestMain()
 
 	c.initTemplates()
 	go c.startWatcher()
