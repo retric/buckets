@@ -42,26 +42,6 @@ func sessionWrap(session *mgo.Session, f sessionFunc) {
 	f(sessionCopy)
 }
 
-/* Test inserting a bucket into the db */
-func bucketTest(session *mgo.Session) {
-	fmt.Printf("bucketTest: retrieving collection\n")
-	collection := session.DB(TestDatabase).C("buckets")
-
-	fmt.Printf("inserting bucket into collection\n")
-	bucket := Bucket{ID: bson.NewObjectId(), Name: "weekly"}
-	insertItem(bucket, collection)
-
-	fmt.Printf("retrieving bucket from collection\n")
-	result := Bucket{}
-	err := collection.Find(bson.M{"name": "weekly"}).One(&result)
-	if err != nil {
-		log.Fatal("error:", err)
-	}
-	fmt.Println("Bucket:", result.Name)
-	fmt.Printf("removing bucket from collection\n")
-	removeItem(bson.M{"name": "weekly"}, collection)
-}
-
 /* Test inserting a task into the db */
 func taskTest(session *mgo.Session) {
 	fmt.Printf("taskTest: retrieving collection\n")
@@ -90,17 +70,19 @@ func taskTest(session *mgo.Session) {
 	removeItem(task, taskCollection)
 }
 
+/* Test suite for Buckets */
 func TestBucket(t *testing.T) {
 	mongoSession := dbSetup()
 	bucket := CreateBucketTest(mongoSession)
-	GetBucketTest(mongoSession, bucket.ID.String())
+	GetBucketTest(mongoSession, bucket.ID.Hex())
+	RemoveBucketTest(mongoSession, bucket.ID.Hex())
 }
 
 /* Test retrieving a bucket */
 func GetBucketTest(session *mgo.Session, id string) {
 	bucket := getBucket(session, id)
 	if bucket == nil {
-
+		log.Fatal("error: bucket not found")
 	}
 }
 
@@ -108,4 +90,14 @@ func GetBucketTest(session *mgo.Session, id string) {
 func CreateBucketTest(session *mgo.Session) *Bucket {
 	bucket := createBucket(session, "weekly", []string{"54f41e6a5786752068000003"})
 	return bucket
+}
+
+/* Test removing a bucket */
+func RemoveBucketTest(session *mgo.Session, id string) {
+	removeBucket(session, id)
+}
+
+/* Test suite for Tasks */
+func TestTask(t *testing.T) {
+	//mongoSession := dbSetup()
 }

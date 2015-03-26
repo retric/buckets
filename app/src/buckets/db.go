@@ -86,6 +86,7 @@ func getBuckets(session *mgo.Session) {
 	log.Printf("bucketsQuery")
 }
 
+/* Create a bucket and insert it into the db */
 func createBucket(session *mgo.Session, name string, tasks []string) *Bucket {
 	collection := session.DB(AuthDatabase).C("buckets")
 
@@ -99,15 +100,26 @@ func createBucket(session *mgo.Session, name string, tasks []string) *Bucket {
 	return &bucket
 }
 
+/* Retrieve a bucket from the db */
 func getBucket(session *mgo.Session, id string) *Bucket {
 	collection := session.DB(AuthDatabase).C("buckets")
 
 	bucket := Bucket{}
-	err := collection.Find(bson.M{"_id": id}).One(&bucket)
+	err := collection.Find(bson.M{"_id": bson.ObjectIdHex(id)}).One(&bucket)
 	if err != nil {
-		log.Printf("getBucket ERROR: %s:\n", err)
+		log.Fatal("getBucket ERROR:", err)
 	}
 	return &bucket
+}
+
+/* Remove a bucket from the db */
+func removeBucket(session *mgo.Session, id string) {
+	collection := session.DB(AuthDatabase).C("buckets")
+
+	err := collection.Remove(bson.M{"_id": bson.ObjectIdHex(id)})
+	if err != nil {
+		log.Fatal("removeBucket ERROR:", err)
+	}
 }
 
 func getTasks(session *mgo.Session) {
