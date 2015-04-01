@@ -1,7 +1,6 @@
 package buckets
 
 import (
-	"fmt"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"log"
@@ -20,7 +19,7 @@ type (
 		ID           bson.ObjectId   `bson:"_id,omitempty"`
 		Name         string          `bson:"name"`
 		DateCreated  time.Time       `bson:"datecreated"`
-		DateModified time.Time       `bson:"datemodigied"`
+		DateModified time.Time       `bson:"datemodified"`
 		Priority     int             `bson:"priority"`
 		Buckets      []bson.ObjectId `bson:buckets"`
 		Completed    bool            `bson:"completed"`
@@ -62,24 +61,21 @@ func insertItem(doc interface{}, collection *mgo.Collection) {
 func removeItem(doc interface{}, collection *mgo.Collection) {
 	err := collection.Remove(doc)
 	if err != nil {
-		fmt.Println("error", err)
+		log.Fatal(err)
 	}
 }
 
 /* Query all buckets from the db */
 func getBuckets(session *mgo.Session) {
-	// Request socket connection from session.
-	// Close session when function is done and return connection to the pool.
+	// Retrieve buckets collection.
 	sessionCopy := session.Copy()
 	defer sessionCopy.Close()
-
-	// Retrieve buckets collection.
 	collection := sessionCopy.DB(AuthDatabase).C("buckets")
 
 	var buckets []Bucket
 	err := collection.Find(nil).All(&buckets)
 	if err != nil {
-		log.Printf("bucketsQuery ERROR: %s\n", err)
+		log.Printf("getBuckets ERROR: %s\n", err)
 		return
 	}
 
@@ -88,7 +84,9 @@ func getBuckets(session *mgo.Session) {
 
 /* Create a bucket and insert it into the db */
 func createBucket(session *mgo.Session, name string, tasks []string) *Bucket {
-	collection := session.DB(AuthDatabase).C("buckets")
+	sessionCopy := session.Copy()
+	defer sessionCopy.Close()
+	collection := sessionCopy.DB(AuthDatabase).C("buckets")
 
 	tasksIds := make([]bson.ObjectId, len(tasks))
 	for i, task := range tasks {
@@ -101,31 +99,87 @@ func createBucket(session *mgo.Session, name string, tasks []string) *Bucket {
 }
 
 /* Retrieve a bucket from the db */
-func getBucket(session *mgo.Session, id string) *Bucket {
-	collection := session.DB(AuthDatabase).C("buckets")
+func getBucket(session *mgo.Session, id string) (*Bucket, error) {
+	sessionCopy := session.Copy()
+	defer sessionCopy.Close()
+	collection := sessionCopy.DB(AuthDatabase).C("buckets")
 
 	bucket := Bucket{}
 	err := collection.Find(bson.M{"_id": bson.ObjectIdHex(id)}).One(&bucket)
-	if err != nil {
-		log.Fatal("getBucket ERROR:", err)
-	}
-	return &bucket
+	return &bucket, err
 }
 
 /* Remove a bucket from the db */
 func removeBucket(session *mgo.Session, id string) {
-	collection := session.DB(AuthDatabase).C("buckets")
+	sessionCopy := session.Copy()
+	defer sessionCopy.Close()
+	collection := sessionCopy.DB(AuthDatabase).C("buckets")
 
-	err := collection.Remove(bson.M{"_id": bson.ObjectIdHex(id)})
+	removeItem(bson.M{"_id": bson.ObjectIdHex(id)}, collection)
+}
+
+/* Retrieve all tasks from the db */
+func getTasks(session *mgo.Session) {
+	sessionCopy := session.Copy()
+	defer sessionCopy.Close()
+	collection := sessionCopy.DB(AuthDatabase).C("tasks")
+
+	var tasks []Task
+	err := collection.Find(nil).All(&tasks)
 	if err != nil {
-		log.Fatal("removeBucket ERROR:", err)
+		log.Printf("getTasks ERROR: %s\n", err)
+		return
 	}
 }
 
-func getTasks(session *mgo.Session) {
+/* Insert a task into the db */
+func createTask(session *mgo.Session, name string, priority int, buckets []string) *Task {
+	sessionCopy := session.Copy()
+	defer sessionCopy.Close()
+	collection := sessionCopy.DB(AuthDatabase).C("tasks")
 
+	bucketIds := make([]bson.ObjectId, len(buckets))
+	for i, bucket := range buckets {
+		bucketIds[i] = bson.ObjectIdHex(bucket)
+	}
+
+	task := Task{ID: bson.NewObjectId(), Name: name, DateCreated: time.Now(),
+		DateModified: time.Now(), Priority: priority,
+		Buckets: bucketIds, Completed: false}
+	insertItem(task, collection)
+
+	return &task
 }
 
-func getTask(session *mgo.Session, id string) {
+/* Retrieve a task from the db */
+func getTask(session *mgo.Session, id string) (*Task, error) {
+	sessionCopy := session.Copy()
+	defer sessionCopy.Close()
+	collection := sessionCopy.DB(AuthDatabase).C("tasks")
 
+	task := Task{}
+	err := collection.Find(bson.M{"_id": bson.ObjectIdHex(id)}).One(&task)
+	return &task, err
+}
+
+/* Update a task in the db */
+func updateTask(session *mgo.Session, id string, task *Task) {
+	sessionCopy := session.Copy()
+	defer sessionCopy.Close()
+	collection := sessionCopy.DB(AuthDatabase).C("tasks")
+
+	err := collection.Update(bson.M{"_id": bson.ObjectIdHex(id)},
+		task)
+	if err != nil {
+		log.Fatal("updateTask ERROR:", err)
+	}
+}
+
+/* Remove a task from the db */
+func removeTask(session *mgo.Session, id string) {
+	sessionCopy := session.Copy()
+	defer sessionCopy.Close()
+	collection := sessionCopy.DB(AuthDatabase).C("tasks")
+
+	removeItem(bson.M{"_id": bson.ObjectIdHex(id)}, collection)
 }

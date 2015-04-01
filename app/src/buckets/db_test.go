@@ -32,16 +32,6 @@ func bucketsQuery(session *mgo.Session) {
 	log.Printf("bucketsQuery")
 }
 
-/* Wrapper for calling other session tests */
-func sessionWrap(session *mgo.Session, f sessionFunc) {
-	// Request socket connection from session.
-	// Close session when fusessionFunc func(*mgo.Session)nction is done and return connection to the pool.
-	sessionCopy := session.Copy()
-	defer sessionCopy.Close()
-
-	f(sessionCopy)
-}
-
 /* Test inserting a task into the db */
 func taskTest(session *mgo.Session) {
 	fmt.Printf("taskTest: retrieving collection\n")
@@ -74,14 +64,16 @@ func taskTest(session *mgo.Session) {
 func TestBucket(t *testing.T) {
 	mongoSession := dbSetup()
 	bucket := CreateBucketTest(mongoSession)
-	GetBucketTest(mongoSession, bucket.ID.Hex())
-	RemoveBucketTest(mongoSession, bucket.ID.Hex())
+	id := bucket.ID.Hex()
+
+	GetBucketTest(mongoSession, id)
+	RemoveBucketTest(mongoSession, id)
 }
 
 /* Test retrieving a bucket */
 func GetBucketTest(session *mgo.Session, id string) {
-	bucket := getBucket(session, id)
-	if bucket == nil {
+	_, err := getBucket(session, id)
+	if err != nil {
 		log.Fatal("error: bucket not found")
 	}
 }
@@ -95,9 +87,55 @@ func CreateBucketTest(session *mgo.Session) *Bucket {
 /* Test removing a bucket */
 func RemoveBucketTest(session *mgo.Session, id string) {
 	removeBucket(session, id)
+	_, err := getBucket(session, id)
+	if err == nil {
+		log.Fatal("error: bucket found after remove attempt")
+	}
 }
 
 /* Test suite for Tasks */
 func TestTask(t *testing.T) {
-	//mongoSession := dbSetup()
+	mongoSession := dbSetup()
+	task := CreateTaskTest(mongoSession)
+	id := task.ID.Hex()
+
+	GetTaskTest(mongoSession, id)
+	UpdateTaskTest(mongoSession, id, task)
+	RemoveTaskTest(mongoSession, id)
+}
+
+/* Test for creating a task */
+func CreateTaskTest(session *mgo.Session) *Task {
+	task := createTask(session, "running", 1, []string{"55145cdb5786751845000001"})
+	return task
+}
+
+/* Test for retrieving a task */
+func GetTaskTest(session *mgo.Session, id string) {
+	_, err := getTask(session, id)
+	if err != nil {
+		log.Fatal("error: task not found")
+	}
+}
+
+/* Test for updating a task */
+func UpdateTaskTest(session *mgo.Session, id string, task *Task) {
+	priority := task.Priority
+	task.Priority = priority + 1
+	updateTask(session, id, task)
+	task2, err := getTask(session, id)
+	if err != nil {
+		log.Fatal("error: task not found after update")
+	} else if task2.Priority != priority+1 {
+		log.Fatal("error: priority not updated")
+	}
+}
+
+/* Test for removing a task */
+func RemoveTaskTest(session *mgo.Session, id string) {
+	removeTask(session, id)
+	_, err := getTask(session, id)
+	if err == nil {
+		log.Fatal("error: task found after remove attempt")
+	}
 }
