@@ -1,6 +1,7 @@
 package buckets
 
 import (
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -22,10 +23,17 @@ func (c *AppController) Action(a Action) http.Handler {
 
 type MyController struct {
 	AppController
-	page      map[string]string
+	Page      map[string]string
 	templates map[string]*template.Template
 	includes  []string
 	session   *mgo.Session
+}
+
+/* Setup template handling and session */
+func (c *MyController) Init() {
+	c.initTemplates()
+	go c.startWatcher()
+	c.initSession(DbSetup())
 }
 
 func (c *MyController) initSession(session *mgo.Session) {
@@ -34,7 +42,7 @@ func (c *MyController) initSession(session *mgo.Session) {
 
 /* View Handlers */
 func (c *MyController) HomeHandler(w http.ResponseWriter, req *http.Request) {
-	c.renderTemplate(w, "home.tmpl", c.page)
+	c.renderTemplate(w, "home.tmpl", c.Page)
 }
 
 func (c *MyController) LoginHandler(w http.ResponseWriter, req *http.Request) {
@@ -42,7 +50,7 @@ func (c *MyController) LoginHandler(w http.ResponseWriter, req *http.Request) {
 		// implement login logic here
 		http.Redirect(w, req, "/", 200)
 	}
-	c.renderTemplate(w, "login.tmpl", c.page)
+	c.renderTemplate(w, "login.tmpl", c.Page)
 }
 
 func (c *MyController) LogoutHandler(w http.ResponseWriter, req *http.Request) {
@@ -54,10 +62,34 @@ func (c *MyController) StaticHandler(w http.ResponseWriter, req *http.Request) {
 	http.ServeFile(w, req, ".."+req.URL.Path)
 }
 
+/* Serialize JSON response and return it */
+func sendJSON(w http.ResponseWriter, v interface{}) {
+	js, err := json.Marshal(v)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(js)
+	return
+}
+
 /* API requests */
 func (c *MyController) BucketsHandler(w http.ResponseWriter, req *http.Request) {
-	if req.Method == "GET" {
-		getBuckets(c.session)
+	vars := mux.Vars(req)
+	tasks := []string{}
+
+	switch req.Method {
+	case "GET":
+		buckets := getBuckets(c.session)
+		sendJSON(w, buckets)
+		return
+	case "POST":
+		name, _ := vars["name"]
+		bucket := createBucket(c.session, name, tasks)
+		sendJSON(w, bucket)
+		return
 	}
 }
 

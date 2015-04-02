@@ -34,7 +34,7 @@ type (
 )
 
 /* Initialize session with database */
-func dbSetup() *mgo.Session {
+func DbSetup() *mgo.Session {
 	mongoDBDialInfo := &mgo.DialInfo{
 		Addrs:    []string{MongoDBHosts},
 		Timeout:  60 * time.Second,
@@ -66,8 +66,7 @@ func removeItem(doc interface{}, collection *mgo.Collection) {
 }
 
 /* Query all buckets from the db */
-func getBuckets(session *mgo.Session) {
-	// Retrieve buckets collection.
+func getBuckets(session *mgo.Session) []Bucket {
 	sessionCopy := session.Copy()
 	defer sessionCopy.Close()
 	collection := sessionCopy.DB(AuthDatabase).C("buckets")
@@ -75,11 +74,10 @@ func getBuckets(session *mgo.Session) {
 	var buckets []Bucket
 	err := collection.Find(nil).All(&buckets)
 	if err != nil {
-		log.Printf("getBuckets ERROR: %s\n", err)
-		return
+		log.Fatal("getBuckets ERROR: %s\n", err)
+		return nil
 	}
-
-	log.Printf("bucketsQuery")
+	return buckets
 }
 
 /* Create a bucket and insert it into the db */

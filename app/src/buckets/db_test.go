@@ -62,7 +62,7 @@ func taskTest(session *mgo.Session) {
 
 /* Test suite for Buckets */
 func TestBucket(t *testing.T) {
-	mongoSession := dbSetup()
+	mongoSession := DbSetup()
 	bucket := CreateBucketTest(mongoSession)
 	id := bucket.ID.Hex()
 
@@ -95,7 +95,7 @@ func RemoveBucketTest(session *mgo.Session, id string) {
 
 /* Test suite for Tasks */
 func TestTask(t *testing.T) {
-	mongoSession := dbSetup()
+	mongoSession := DbSetup()
 	task := CreateTaskTest(mongoSession)
 	id := task.ID.Hex()
 
