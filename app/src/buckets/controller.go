@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"log"
 	"net/http"
 	//"strconv"
 
@@ -77,43 +78,62 @@ func sendJSON(w http.ResponseWriter, v interface{}) {
 
 /* API requests */
 func (c *MyController) BucketsHandler(w http.ResponseWriter, req *http.Request) {
-	vars := mux.Vars(req)
-	tasks := []string{}
-
 	switch req.Method {
 	case "GET":
 		buckets := getBuckets(c.session)
 		sendJSON(w, buckets)
 		return
 	case "POST":
-		name, _ := vars["name"]
-		bucket := createBucket(c.session, name, tasks)
+		var bForm BucketPart
+		err := json.NewDecoder(req.Body).Decode(&bForm)
+		if err != nil {
+			log.Fatal("jsonError:", err)
+		}
+		bucket := createBucket(c.session, bForm)
 		sendJSON(w, bucket)
 		return
 	}
 }
 
 func (c *MyController) BucketHandler(w http.ResponseWriter, req *http.Request) {
-	// vars := mux.Vars(req)
-	// id, _ := vars["id"]
+	vars := mux.Vars(req)
+	id, _ := vars["id"]
 
 	switch req.Method {
 	case "GET", "":
-		// bucket := getBucket(c.session, id)
-		// implement form return
+		bucket, _ := getBucket(c.session, id)
+		sendJSON(w, bucket)
 		return
 	case "POST":
 		return
 	case "PUT":
+		var bForm BucketPart
+		err := json.NewDecoder(req.Body).Decode(&bForm)
+		if err != nil {
+			log.Fatal("jsonError:", err)
+		}
+		updateBucket(c.session, id, bForm)
 		return
 	case "DELETE":
+		removeBucket(c.session, id)
 		return
 	}
 }
 
 func (c *MyController) TasksHandler(w http.ResponseWriter, req *http.Request) {
-	if req.Method == "GET" {
-
+	switch req.Method {
+	case "GET":
+		buckets := getBuckets(c.session)
+		sendJSON(w, buckets)
+		return
+	case "POST":
+		var tForm TaskPart
+		err := json.NewDecoder(req.Body).Decode(&tForm)
+		if err != nil {
+			log.Fatal("jsonError:", err)
+		}
+		task := createTask(c.session, tForm)
+		sendJSON(w, task)
 	}
 }
 
@@ -122,14 +142,22 @@ func (c *MyController) TaskHandler(w http.ResponseWriter, req *http.Request) {
 	id, _ := vars["id"]
 
 	switch req.Method {
-	case "GET", "":
-		getTask(c.session, id)
+	case "GET":
+		task, _ := getTask(c.session, id)
+		sendJSON(w, task)
 		return
 	case "POST":
 		return
 	case "PUT":
+		var tForm TaskPart
+		err := json.NewDecoder(req.Body).Decode(&tForm)
+		if err != nil {
+			log.Fatal("jsonError:", err)
+		}
+		updateTask(c.session, id, tForm)
 		return
 	case "DELETE":
+		removeTask(c.session, id)
 		return
 	}
 

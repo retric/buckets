@@ -31,6 +31,20 @@ type (
 		Name  string          `bson:"name"`
 		Tasks []bson.ObjectId `bson:"tasks"`
 	}
+
+	BucketPart struct {
+		Name  string
+		Tasks []string
+	}
+
+	TaskPart struct {
+		Name         string
+		DateCreated  time.Time
+		DateModified time.Time
+		Priority     int
+		Buckets      []string
+		Completed    bool
+	}
 )
 
 /* Initialize session with database */
@@ -81,16 +95,16 @@ func getBuckets(session *mgo.Session) []Bucket {
 }
 
 /* Create a bucket and insert it into the db */
-func createBucket(session *mgo.Session, name string, tasks []string) *Bucket {
+func createBucket(session *mgo.Session, bForm BucketPart) *Bucket {
 	sessionCopy := session.Copy()
 	defer sessionCopy.Close()
 	collection := sessionCopy.DB(AuthDatabase).C("buckets")
 
-	tasksIds := make([]bson.ObjectId, len(tasks))
-	for i, task := range tasks {
+	tasksIds := make([]bson.ObjectId, len(bForm.Tasks))
+	for i, task := range bForm.Tasks {
 		tasksIds[i] = bson.ObjectIdHex(task)
 	}
-	bucket := Bucket{ID: bson.NewObjectId(), Name: name, Tasks: tasksIds}
+	bucket := Bucket{ID: bson.NewObjectId(), Name: bForm.Name, Tasks: tasksIds}
 	insertItem(bucket, collection)
 
 	return &bucket
@@ -105,6 +119,23 @@ func getBucket(session *mgo.Session, id string) (*Bucket, error) {
 	bucket := Bucket{}
 	err := collection.Find(bson.M{"_id": bson.ObjectIdHex(id)}).One(&bucket)
 	return &bucket, err
+}
+
+/* Update a bucket in the db */
+func updateBucket(session *mgo.Session, id string, bForm BucketPart) {
+	sessionCopy := session.Copy()
+	defer sessionCopy.Close()
+	collection := sessionCopy.DB(AuthDatabase).C("buckets")
+
+	tasksIds := make([]bson.ObjectId, len(bForm.Tasks))
+	for i, task := range bForm.Tasks {
+		tasksIds[i] = bson.ObjectIdHex(task)
+	}
+	bucket := bson.M{"name": bForm.Name, "tasks": tasksIds}
+	err := collection.Update(bson.M{"_id": bson.ObjectIdHex(id)}, bson.M{"$set": bucket})
+	if err != nil {
+		log.Fatal("updateTask ERROR:", err)
+	}
 }
 
 /* Remove a bucket from the db */
@@ -131,19 +162,19 @@ func getTasks(session *mgo.Session) {
 }
 
 /* Insert a task into the db */
-func createTask(session *mgo.Session, name string, priority int, buckets []string) *Task {
+func createTask(session *mgo.Session, tForm TaskPart) *Task {
 	sessionCopy := session.Copy()
 	defer sessionCopy.Close()
 	collection := sessionCopy.DB(AuthDatabase).C("tasks")
 
-	bucketIds := make([]bson.ObjectId, len(buckets))
-	for i, bucket := range buckets {
+	bucketIds := make([]bson.ObjectId, len(tForm.Buckets))
+	for i, bucket := range tForm.Buckets {
 		bucketIds[i] = bson.ObjectIdHex(bucket)
 	}
 
-	task := Task{ID: bson.NewObjectId(), Name: name, DateCreated: time.Now(),
-		DateModified: time.Now(), Priority: priority,
-		Buckets: bucketIds, Completed: false}
+	task := Task{ID: bson.NewObjectId(), Name: tForm.Name, DateCreated: time.Now(),
+		DateModified: time.Now(), Priority: tForm.Priority,
+		Buckets: bucketIds, Completed: tForm.Completed}
 	insertItem(task, collection)
 
 	return &task
@@ -161,13 +192,23 @@ func getTask(session *mgo.Session, id string) (*Task, error) {
 }
 
 /* Update a task in the db */
-func updateTask(session *mgo.Session, id string, task *Task) {
+func updateTask(session *mgo.Session, id string, tForm TaskPart) {
 	sessionCopy := session.Copy()
 	defer sessionCopy.Close()
 	collection := sessionCopy.DB(AuthDatabase).C("tasks")
 
+	bucketIds := make([]bson.ObjectId, len(tForm.Buckets))
+	for i, bucket := range tForm.Buckets {
+		bucketIds[i] = bson.ObjectIdHex(bucket)
+	}
+
+	task := bson.M{"name": tForm.Name,
+		"priority":     tForm.Priority,
+		"datemodified": time.Now(),
+		"buckets":      bucketIds,
+		"completed":    tForm.Completed}
 	err := collection.Update(bson.M{"_id": bson.ObjectIdHex(id)},
-		task)
+		bson.M{"$set": task})
 	if err != nil {
 		log.Fatal("updateTask ERROR:", err)
 	}

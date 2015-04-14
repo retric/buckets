@@ -67,6 +67,7 @@ func TestBucket(t *testing.T) {
 	id := bucket.ID.Hex()
 
 	GetBucketTest(mongoSession, id)
+	UpdateBucketTest(mongoSession, id)
 	RemoveBucketTest(mongoSession, id)
 }
 
@@ -80,8 +81,15 @@ func GetBucketTest(session *mgo.Session, id string) {
 
 /* Test creating a bucket */
 func CreateBucketTest(session *mgo.Session) *Bucket {
-	bucket := createBucket(session, "weekly", []string{"54f41e6a5786752068000003"})
+	bucketPart := BucketPart{Name: "weekly", Tasks: []string{"54f41e6a5786752068000003"}}
+	bucket := createBucket(session, bucketPart)
 	return bucket
+}
+
+/* Test updating a bucket */
+func UpdateBucketTest(session *mgo.Session, id string) {
+	bucketPart := BucketPart{Name: "monthly", Tasks: []string{"54f41e6a5786752068000004"}}
+	updateBucket(session, id, bucketPart)
 }
 
 /* Test removing a bucket */
@@ -106,7 +114,8 @@ func TestTask(t *testing.T) {
 
 /* Test for creating a task */
 func CreateTaskTest(session *mgo.Session) *Task {
-	task := createTask(session, "running", 1, []string{"55145cdb5786751845000001"})
+	taskPart := TaskPart{Name: "running", Priority: 1, Buckets: []string{"55145cdb5786751845000001"}}
+	task := createTask(session, taskPart)
 	return task
 }
 
@@ -120,13 +129,17 @@ func GetTaskTest(session *mgo.Session, id string) {
 
 /* Test for updating a task */
 func UpdateTaskTest(session *mgo.Session, id string, task *Task) {
-	priority := task.Priority
-	task.Priority = priority + 1
-	updateTask(session, id, task)
+	tForm := TaskPart{Name: task.Name,
+		DateCreated:  task.DateCreated,
+		DateModified: task.DateModified,
+		Priority:     task.Priority + 1,
+		Buckets:      []string{"54f41e6a5786752068000003"},
+		Completed:    task.Completed}
+	updateTask(session, id, tForm)
 	task2, err := getTask(session, id)
 	if err != nil {
 		log.Fatal("error: task not found after update")
-	} else if task2.Priority != priority+1 {
+	} else if task2.Priority != task.Priority+1 {
 		log.Fatal("error: priority not updated")
 	}
 }

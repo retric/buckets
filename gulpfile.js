@@ -53,7 +53,7 @@ gulp.task('watch', function() {
 });
 
 // main build tasks.
-gulp.task('build', ['test'], shell.task(['go install buckets | tee build.log']));
+gulp.task('build', ['test'], shell.task(['go install main | tee build.log']));
 gulp.task('test', shell.task(['go test buckets']));
 
 gulp.task('default', ['watch', 'js', 'libs', 'css', 'build', 'test']);
