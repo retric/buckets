@@ -9,10 +9,9 @@ var Buckets = React.createClass({
         test[i] = 0;
     }
 
-    var data = this.props.data;
-    var bucketlists = test.map(function(item, index) {
+    var bucketlists = this.props.data.map(function(item, index) {
       return (
-      <BucketList data={data} />
+      <BucketList data={item} key={index} />
       );
     });
     return (
@@ -27,17 +26,18 @@ var Buckets = React.createClass({
 var BucketList = React.createClass({
 
   render: function() {
-      var bucketnodes = this.props.data.map(function(object, index) {
+      var tasks = this.props.data.Tasks;
+      var bucketnodes = tasks.map(function(object, index) {
         return (
           <Item key={index} >
-          {object.rank} {object.text}
+          {object.Priority} {object.Name}
           </Item>
         );
       });
       return(
         <div className="bucketCase">
         <div className="bucket">
-        <span className="listName">Name</span>
+        <span className="listName">{this.props.data.Name || "null"}</span>
         <ol className="bucketList">
           {bucketnodes}
         </ol>
