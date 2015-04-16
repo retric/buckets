@@ -20,7 +20,7 @@ var NewBucket = React.createClass({
             type: 'POST',
             data: bucketPart,
             success: function(data) {
-
+                this.props.addBucket(data);
             }.bind(this),
             error: function(xhr, status, err) {
                 console.error('api/buckets/', status, err.toString());

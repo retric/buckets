@@ -11,7 +11,7 @@ var paths = {
   jsx: ['./app/static/jsx/app.jsx'],
   js: ['app/static/jsx/*.jsx', 'app/static/jsx/components/*.jsx'],
   css: ['app/static/css/scss/*.scss'],
-  go: ['app/src/main/*.go'],
+  go: ['app/src/main/*.go', 'app/src/buckets/*.go'],
 };
 
 // dependency task. clean out existing builds.

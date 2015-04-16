@@ -90,6 +90,7 @@ func (c *MyController) BucketsHandler(w http.ResponseWriter, req *http.Request) 
 			log.Fatal("jsonError:", err)
 		}
 		bucket := createBucket(c.session, bForm)
+		w.WriteHeader(201)
 		sendJSON(w, bucket)
 		return
 	}
@@ -113,9 +114,13 @@ func (c *MyController) BucketHandler(w http.ResponseWriter, req *http.Request) {
 			log.Fatal("jsonError:", err)
 		}
 		updateBucket(c.session, id, bForm)
+		w.WriteHeader(204)
+		sendJSON(w, nil)
 		return
 	case "DELETE":
 		removeBucket(c.session, id)
+		w.WriteHeader(204)
+		sendJSON(w, nil)
 		return
 	}
 }
@@ -133,6 +138,7 @@ func (c *MyController) TasksHandler(w http.ResponseWriter, req *http.Request) {
 			log.Fatal("jsonError:", err)
 		}
 		task := createTask(c.session, tForm)
+		w.WriteHeader(201)
 		sendJSON(w, task)
 	}
 }
@@ -155,9 +161,13 @@ func (c *MyController) TaskHandler(w http.ResponseWriter, req *http.Request) {
 			log.Fatal("jsonError:", err)
 		}
 		updateTask(c.session, id, tForm)
+		w.WriteHeader(204)
+		sendJSON(w, nil)
 		return
 	case "DELETE":
 		removeTask(c.session, id)
+		w.WriteHeader(204)
+		sendJSON(w, nil)
 		return
 	}
 
