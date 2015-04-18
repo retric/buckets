@@ -59,11 +59,10 @@ var NewBucketForm = React.createClass({
         return (
                 <div className="bucketCase">
                 <div className="bucket newBucket">
-                <form className="newBucketForm" onSubmit={this.handleSubmit}>
+                <form className="bucketForm" onSubmit={this.handleSubmit}>
                 <input type="text" placeholder="Bucket name" ref="name" />
-                <p />
-                <input type = "submit" value="Submit" />
-                <input type = "button" value="Cancel" onClick={this.props.xClick} />
+                <input type = "submit" className="submit" value="Submit" />
+                <a href="" className="X" onClick={this.props.xClick} >x</a>
                 </form>
                 </div></div>
 

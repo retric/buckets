@@ -7,27 +7,36 @@ ol {
 }
 
 .bucketCase {
-         padding: 5px / 960px * 100%;
-         margin: 1px;
-         position: relative;
-         float: left;
-         width: 318px / 960px * 100%;
+     padding: 5px / 960px * 100%;
+     margin: 1px;
+     position: relative;
+     float: left;
+     width: 318px / 960px * 100%;
+     overflow: hidden;
 }
 
 .bucket {
     border-style: solid;
     border-width: 1px;
     padding: 25px / 960px * 100%;
-
+    overflow: hidden;
 }
 
 .newBucket {
-    margin-left: auto;
-    margin-right: auto;
-    text-align: center;
 }
 
 .X {
     float: right;
 }
 
+.bucketForm {
+    margin: 0px;
+    padding: 0px;
+    display: inline;
+}
+
+.submit {
+    visibility: hidden;
+    position: absolute;
+    left: -9999px;
+}

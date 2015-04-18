@@ -9,17 +9,24 @@ ol {
   margin: 1px;
   position: relative;
   float: left;
-  width: 33.125%; }
+  width: 33.125%;
+  overflow: hidden; }
 
 .bucket {
   border-style: solid;
   border-width: 1px;
-  padding: 2.60417%; }
-
-.newBucket {
-  margin-left: auto;
-  margin-right: auto;
-  text-align: center; }
+  padding: 2.60417%;
+  overflow: hidden; }
 
 .X {
   float: right; }
+
+.bucketForm {
+  margin: 0px;
+  padding: 0px;
+  display: inline; }
+
+.submit {
+  visibility: hidden;
+  position: absolute;
+  left: -9999px; }

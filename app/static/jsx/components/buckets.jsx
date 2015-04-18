@@ -16,7 +16,6 @@ var Buckets = React.createClass({
   },
 
   deleteBucket: function(bucketKey) {
-    console.log("splicing ", bucketKey);
     var dataCopy = this.state.data.slice(0);
     dataCopy.splice(bucketKey, 1);
     this.setState({data: dataCopy});
@@ -67,6 +66,7 @@ var BucketList = React.createClass({
 
   render: function() {
       var partX = this.state.showX ? <X submitDelete={this.submitDelete} /> : null;
+      
       var tasks = this.props.data.Tasks;
       var bucketnodes = tasks.map(function(object, index) {
         return (
@@ -78,7 +78,7 @@ var BucketList = React.createClass({
       return(
         <div className="bucketCase" onMouseEnter={this.showX} onMouseLeave={this.hideX}>
         <div className="bucket">
-        <span className="listName">{this.props.data.Name || "null"}</span>
+        <NameBox name={this.props.data.Name || "null"}/>
         {partX}
         <ol className="bucketList">
           {bucketnodes}
@@ -100,6 +100,44 @@ var Item = React.createClass({
     );
   }
 
+});
+
+var NameBox = React.createClass({
+
+    getInitialState: function() {
+        return {nameClicked: false};
+    },
+
+    clickForm: function() {
+        this.setState({nameClicked: true});
+    },
+
+    handleSubmit: function(event) {
+        event.preventDefault();
+        this.setState({nameClicked: false});
+    },
+
+    componentWillReceiveProps: function(nextProps) {
+        if (nextProps.name != this.state.name) {
+            this.setState({nameClicked: false});
+        }
+        this.setState({name: nextProps.name});
+    },
+
+    render: function() {
+        var name = this.state.name || this.props.name || "null";
+        if (!this.state.nameClicked) {
+            return (
+                <span className="listName" onClick={this.clickForm}>{name}</span>
+                );
+        } else {
+            return (
+                <form className="bucketForm" onSubmit={this.handleSubmit}>
+                <input type="text" ref="newname" defaultValue={name} />
+                <input type="submit" className="submit" value="Submit" /></form>
+            );
+        }
+    }
 });
 
 var X = React.createClass({
