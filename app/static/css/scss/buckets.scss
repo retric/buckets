@@ -15,6 +15,18 @@ ol {
      overflow: hidden;
 }
 
+@media (min-width:481px) and (max-width:992px) {
+    .bucketCase:nth-child(2n+1) {
+        clear: left;
+    }
+}
+
+@media (min-width:993px) {
+    .bucketCase:nth-child(3n+1) {
+        clear: left;
+    }
+}
+
 .bucket {
     border-style: solid;
     border-width: 1px;

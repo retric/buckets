@@ -113,9 +113,9 @@ func (c *MyController) BucketHandler(w http.ResponseWriter, req *http.Request) {
 		if err != nil {
 			log.Fatal("jsonError:", err)
 		}
-		updateBucket(c.session, id, bForm)
-		w.WriteHeader(204)
-		sendJSON(w, nil)
+		bucket, _ := updateBucket(c.session, id, bForm)
+		w.WriteHeader(201)
+		sendJSON(w, bucket)
 		return
 	case "DELETE":
 		removeBucket(c.session, id)
@@ -160,9 +160,9 @@ func (c *MyController) TaskHandler(w http.ResponseWriter, req *http.Request) {
 		if err != nil {
 			log.Fatal("jsonError:", err)
 		}
-		updateTask(c.session, id, tForm)
-		w.WriteHeader(204)
-		sendJSON(w, nil)
+		task, _ := updateTask(c.session, id, tForm)
+		w.WriteHeader(201)
+		sendJSON(w, task)
 		return
 	case "DELETE":
 		removeTask(c.session, id)

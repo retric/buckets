@@ -21,10 +21,17 @@ var Buckets = React.createClass({
     this.setState({data: dataCopy});
   },
 
+  updateBucket: function(bucketKey, data) {
+      var dataCopy = this.state.data.slice(0);
+      dataCopy[bucketKey] = data;
+      this.setState({data: dataCopy});
+  },
+
   render: function() {
     var bucketlists = this.state.data.map(function(item, index) {
       return (
-      <BucketList data={item} key={index} index={index} deleteMe={this.deleteBucket} />
+      <BucketList data={item} key={index} index={index} 
+          deleteMe={this.deleteBucket} updateMe={this.updateBucket} />
       );
     }.bind(this));
     return (
@@ -64,6 +71,22 @@ var BucketList = React.createClass({
     });
   },
 
+  onNameSubmit: function(bucketName) {
+    var api_url = 'api/buckets/' + this.props.data.ID;  
+    $.ajax({
+        url: api_url, 
+        dataType: 'json',
+        type: 'PUT',
+        data: bucketName,
+        success: function(data) {
+            this.props.updateMe(this.props.index, data);
+        }.bind(this),
+        error: function(xhr, status, err) {
+            console.error(api_url, status, err.toString());
+        }.bind(this)
+    });
+  },
+
   render: function() {
       var partX = this.state.showX ? <X submitDelete={this.submitDelete} /> : null;
       
@@ -78,7 +101,7 @@ var BucketList = React.createClass({
       return(
         <div className="bucketCase" onMouseEnter={this.showX} onMouseLeave={this.hideX}>
         <div className="bucket">
-        <NameBox name={this.props.data.Name || "null"}/>
+        <NameBox name={this.props.data.Name || "null"} onNameSubmit={this.onNameSubmit} />
         {partX}
         <ol className="bucketList">
           {bucketnodes}
@@ -115,6 +138,12 @@ var NameBox = React.createClass({
     handleSubmit: function(event) {
         event.preventDefault();
         this.setState({nameClicked: false});
+        var name = React.findDOMNode(this.refs.newname).value.trim();
+        if (!name) {
+            return;
+        }
+        this.props.onNameSubmit(JSON.stringify({ name: name }));
+        React.findDOMNode(this.refs.newname).value = '';
     },
 
     componentWillReceiveProps: function(nextProps) {

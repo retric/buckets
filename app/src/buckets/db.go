@@ -122,7 +122,7 @@ func getBucket(session *mgo.Session, id string) (*Bucket, error) {
 }
 
 /* Update a bucket in the db */
-func updateBucket(session *mgo.Session, id string, bForm BucketPart) {
+func updateBucket(session *mgo.Session, id string, bForm BucketPart) (*Bucket, error) {
 	sessionCopy := session.Copy()
 	defer sessionCopy.Close()
 	collection := sessionCopy.DB(AuthDatabase).C("buckets")
@@ -131,11 +131,14 @@ func updateBucket(session *mgo.Session, id string, bForm BucketPart) {
 	for i, task := range bForm.Tasks {
 		tasksIds[i] = bson.ObjectIdHex(task)
 	}
-	bucket := bson.M{"name": bForm.Name, "tasks": tasksIds}
-	err := collection.Update(bson.M{"_id": bson.ObjectIdHex(id)}, bson.M{"$set": bucket})
+	bucketUpdate := bson.M{"name": bForm.Name, "tasks": tasksIds}
+	err := collection.Update(bson.M{"_id": bson.ObjectIdHex(id)}, bson.M{"$set": bucketUpdate})
 	if err != nil {
-		log.Fatal("updateTask ERROR:", err)
+		log.Fatal("updateBucket ERROR:", err)
 	}
+	bucket := Bucket{}
+	err = collection.Find(bson.M{"_id": bson.ObjectIdHex(id)}).One(&bucket)
+	return &bucket, err
 }
 
 /* Remove a bucket from the db */
@@ -192,7 +195,7 @@ func getTask(session *mgo.Session, id string) (*Task, error) {
 }
 
 /* Update a task in the db */
-func updateTask(session *mgo.Session, id string, tForm TaskPart) {
+func updateTask(session *mgo.Session, id string, tForm TaskPart) (*Task, error) {
 	sessionCopy := session.Copy()
 	defer sessionCopy.Close()
 	collection := sessionCopy.DB(AuthDatabase).C("tasks")
@@ -202,16 +205,19 @@ func updateTask(session *mgo.Session, id string, tForm TaskPart) {
 		bucketIds[i] = bson.ObjectIdHex(bucket)
 	}
 
-	task := bson.M{"name": tForm.Name,
+	taskUpdate := bson.M{"name": tForm.Name,
 		"priority":     tForm.Priority,
 		"datemodified": time.Now(),
 		"buckets":      bucketIds,
 		"completed":    tForm.Completed}
 	err := collection.Update(bson.M{"_id": bson.ObjectIdHex(id)},
-		bson.M{"$set": task})
+		bson.M{"$set": taskUpdate})
 	if err != nil {
 		log.Fatal("updateTask ERROR:", err)
 	}
+	task := Task{}
+	err = collection.Find(bson.M{"_id": bson.ObjectIdHex(id)}).One(&task)
+	return &task, err
 }
 
 /* Remove a task from the db */
