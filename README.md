@@ -10,7 +10,7 @@ bundle all js files and simplify frontend dependency management.
 
 Installation
 ------------ 
-Required dependencies: node, go, [gpm](https://github.com/pote/gpm). 
+Required dependencies: node, go, [gpm](https://github.com/pote/gpm), mongodb. 
 
 $GOROOT and $GOPATH should be set when running go builds. Setup may be
 simplified with [gvm](https://github.com/moovweb/gvm) as detailed in the steps
@@ -25,6 +25,8 @@ project directory:
 
 Alternately, you could just install all node packages globally.
 
+The Go server also requires an existing instance of mongodb up and running 
+before it can be reached.
 
 ### Steps:
 
@@ -52,4 +54,7 @@ Run the executable within app/bin to start the server.
     
     $ cd app/bin
     $ ./main
+
+The web app can then be accessed from localhost:3000.
+
 

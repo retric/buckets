@@ -135,6 +135,10 @@ var NameBox = React.createClass({
         this.setState({nameClicked: true});
     },
 
+    blurForm: function() {
+        this.setState({nameClicked: false});
+    },
+
     handleSubmit: function(event) {
         event.preventDefault();
         this.setState({nameClicked: false});
@@ -153,6 +157,12 @@ var NameBox = React.createClass({
         this.setState({name: nextProps.name});
     },
 
+    componentDidUpdate: function() {
+        if (this.state.nameClicked) {
+            React.findDOMNode(this.refs.newname).focus();
+        }
+    },
+
     render: function() {
         var name = this.state.name || this.props.name || "null";
         if (!this.state.nameClicked) {
@@ -162,8 +172,8 @@ var NameBox = React.createClass({
         } else {
             return (
                 <form className="bucketForm" onSubmit={this.handleSubmit}>
-                <input type="text" ref="newname" defaultValue={name} />
-                <input type="submit" className="submit" value="Submit" /></form>
+                <input type="text" ref="newname" defaultValue={name} onBlur={this.blurForm}/>
+                <input type="submit" className="submit" value="Submit"/></form>
             );
         }
     }

@@ -1,11 +1,33 @@
+.header {
+  font-size: 1.8em;
+  padding: 1%;
+  text-align: center; }
+
 a {
   text-decoration: none; }
 
 ol {
   margin-bottom: 0; }
 
+body {
+  background: #DFF0D8; }
+
+textarea, input, textarea:hover, input:hover, textarea:active, input:active, textarea:focus, input:focus {
+  outline: 0px !important;
+  -webkit-appearance: none;
+  background: none;
+  box-shadow: none;
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+  border: none; }
+
+#app {
+  width: 75%;
+  padding: 1%;
+  background: white; }
+
 .bucketCase {
-  padding: 0.52083%;
+  padding: 1.04167%;
   margin: 1px;
   position: relative;
   float: left;
@@ -21,18 +43,25 @@ ol {
     clear: left; } }
 
 .bucket {
-  border-style: solid;
+  border-style: none;
   border-width: 1px;
   padding: 2.60417%;
-  overflow: hidden; }
+  overflow: hidden;
+  background: #eee;
+  min-height: 150px; }
 
 .X {
   float: right; }
 
+.listName {
+  font-size: 1.2em;
+  color: #aaa; }
+
 .bucketForm {
   margin: 0px;
   padding: 0px;
-  display: inline; }
+  display: inline;
+  font-size: 1.2em; }
 
 .submit {
   visibility: hidden;
