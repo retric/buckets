@@ -33,7 +33,8 @@ var NewBucket = React.createClass({
             return (
                 <div className="bucketCase">
                 <div className="bucket newBucket">
-                <a href="" onClick={this.handleClick}>+</a>
+                <a href="" onClick={this.handleClick}>
+                <span className="glyphicon glyphicon-plus" aria-hidden="true"></span></a>
                 </div></div>
                 );
         } else {
@@ -55,6 +56,9 @@ var NewBucketForm = React.createClass({
         this.props.onBucketSubmit(JSON.stringify({ name: name }));
         React.findDOMNode(this.refs.name).value = '';
     },
+    componentDidMount: function() {
+        React.findDOMNode(this.refs.name).focus();
+    },
     render: function() {
         return (
                 <div className="bucketCase">
@@ -62,7 +66,8 @@ var NewBucketForm = React.createClass({
                 <form className="bucketForm" onSubmit={this.handleSubmit}>
                 <input type="text" placeholder="Bucket name" ref="name" />
                 <input type = "submit" className="submit" value="Submit" />
-                <a href="" className="X" onClick={this.props.xClick} >x</a>
+                <a href="" className="X" onClick={this.props.xClick} >
+                <span className="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
                 </form>
                 </div></div>
 

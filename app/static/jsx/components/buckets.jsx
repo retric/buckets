@@ -45,16 +45,16 @@ var Buckets = React.createClass({
 
 var BucketList = React.createClass({
   getInitialState: function() {
-    return {showX: false};
+    return {showX: true};
   },
 
   showX: function() {
     this.setState({showX: true});
   },
 
-  hideX: function() {
-    this.setState({showX: false});
-  },
+  //hideX: function() {
+  //  this.setState({showX: false});
+  //},
 
   submitDelete: function() {
     var api_url = 'api/buckets/' + this.props.data.ID;  
@@ -99,7 +99,8 @@ var BucketList = React.createClass({
         );
       });
       return(
-        <div className="bucketCase" onMouseEnter={this.showX} onMouseLeave={this.hideX}>
+        //<div className="bucketCase" onMouseEnter={this.showX} onMouseLeave={this.hideX}>
+        <div className="bucketCase">
         <div className="bucket">
         <NameBox name={this.props.data.Name || "null"} onNameSubmit={this.onNameSubmit} />
         {partX}
@@ -188,7 +189,8 @@ var X = React.createClass({
 
     render: function() {
       return (
-        <a href="" className="X" onClick={this.handleClick}>x</a>
+        <a href="" className="X" onClick={this.handleClick}>
+        <span className="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a>
       );
     }
 });

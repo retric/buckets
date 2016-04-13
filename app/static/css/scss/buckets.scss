@@ -8,6 +8,20 @@ a {
     text-decoration: none;
 }
 
+.X {
+    float: right;
+}
+
+.glyphicon {
+    text-decoration: none;
+    color: #aaa;
+    font-size: 1.2em;
+}
+
+.glyphicon:hover {
+    color: #8C8080;
+}
+
 ol {
     margin-bottom: 0;
 }
@@ -71,10 +85,6 @@ input:focus,
 }
 
 .newBucket {
-}
-
-.X {
-    float: right;
 }
 
 .listName {

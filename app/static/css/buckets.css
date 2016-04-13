@@ -6,6 +6,17 @@
 a {
   text-decoration: none; }
 
+.X {
+  float: right; }
+
+.glyphicon {
+  text-decoration: none;
+  color: #aaa;
+  font-size: 1.2em; }
+
+.glyphicon:hover {
+  color: #8C8080; }
+
 ol {
   margin-bottom: 0; }
 
@@ -49,9 +60,6 @@ textarea, input, textarea:hover, input:hover, textarea:active, input:active, tex
   overflow: hidden;
   background: #eee;
   min-height: 150px; }
-
-.X {
-  float: right; }
 
 .listName {
   font-size: 1.2em;
